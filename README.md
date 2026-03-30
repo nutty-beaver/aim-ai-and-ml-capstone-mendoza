@@ -149,7 +149,7 @@ Performance was translated into operational and financial impact to justify mode
 ## Conclusion
 **XGBoost** is recommended as the optimal choice for this NIDS implementation due to its high technical accuracy and low operational cost. Despite being a supervised model, it proved more effective at detecting novel attacks than the unsupervised alternatives. Among unsupervised options, the **Autoencoder (AE 2)** is the superior choice for its higher precision and improved reliability in zero-day scenarios.
 
-# Ethical AI & Bias Auditing
+# Bias & Fairness Analysis
 
 To ensure the integrity, transparency, and operational fairness of the deployed models, an analysis was conducted covering model explainability, technical limitations, and strategies for bias detection.
 
