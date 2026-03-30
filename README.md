@@ -87,6 +87,29 @@ To rigorously test the models' zero-day detection capabilities, the target label
 * **Supervised/Known Attacks (1):** High-volume, distinct attacks used for training (`DoS Hulk`, `DDoS`, `PortScan`, `FTP-Patator`, `SSH-Patator`).
 * **Novel/Benchmark Attacks (2):** Sophisticated, stealthy, or low-volume attacks explicitly excluded from training to test anomaly detection capabilities (`Infiltration`, `Bot`, `DoS slowloris`, `Heartbleed`, and various `Web Attacks`).
 
+# Model Development & Iteration
+
+The model development phase focused on two primary unsupervised architectures for anomaly detection (**Isolation Forest** and an **ANN Autoencoder**) and one supervised benchmark (**XGBoost**). The unsupervised models went through iterative refinements to optimize their ability to distinguish normal network traffic from anomalous behavior.
+
+## 1. Isolation Forest (IF)
+The Isolation Forest models were developed across two iterations to test the impact of training data purity.
+* **Iteration 1 (Mixed Train):** The model was trained on a dataset that included both normal and anomalous data. This led to a higher False Positive rate because the model familiarized itself with anomalous data, treating some attack clusters as normal variations.
+* **Iteration 2 (Clean Train):** The model was trained exclusively on clean, benign data. This allowed the model to build a much tighter boundary around what constitutes "normal" traffic.
+* **Key Findings & Winner:** Iteration 2 was the clear winner. By ensuring the model only saw clean data during training, Overall Accuracy jumped by 16.4% and Anomaly Precision improved by 68.6%. Most importantly, False Positives were reduced by ~66.7%, massively cutting down on potential alarm fatigue. 
+* **Curve Analysis:** An analysis of the Precision-Recall (PR) curve revealed a dip at low recall. This suggests that the model sometimes isolates normal data points (such as natural network bottlenecks) faster than actual anomalies.
+
+## 2. ANN Autoencoder
+The Autoencoder was designed to learn the underlying patterns of normal traffic and flag anomalies based on high reconstruction errors.
+* **Iteration 1 (Standard Architecture):** Built with a wide-to-narrow structure utilizing a ReLU bottleneck (8 neurons). It employed L2 regularization, Dropout (0.2/0.3), and Batch Normalization to ensure the model learned general patterns rather than memorizing noise.
+* **Iteration 2 (Leaner Architecture):** A streamlined variation that removed L2 regularization to reduce complexity, reduced the landing layer from 128 to 96 neurons, and replaced the ReLU bottleneck with a linear activation function.
+* **Key Findings & Winner:** Iteration 2 outperformed the first iteration. While Iteration 1 had a slightly better Anomaly Recall (0.53 vs. 0.51), Iteration 2 delivered a major improvement in class separation (PR AUC increased by +0.0634). Furthermore, Iteration 2 reduced False Positives by ~53.5% and improved Anomaly Precision by 11.4%, providing a much better balance between detection and accuracy.
+
+## 3. XGBoost (Supervised Benchmark)
+To establish a strong performance ceiling, XGBoost was implemented as the supervised benchmark, chosen for its industry-leading combination of boosting, regularization, and computational efficiency. 
+* **Addressing Class Imbalance:** The extreme imbalance between benign and anomalous traffic was directly mitigated within the model pipeline. The `scale_pos_weight` parameter was dynamically calculated using the ratio of negative (normal) to positive (anomaly) instances, and the model's internal evaluation metric was set to optimize for Precision-Recall (`aucpr`).
+* **Hyperparameter Tuning & Regularization:** To prevent the model from memorizing the high-dimensional training data, `RandomizedSearchCV` coupled with `StratifiedKFold` cross-validation was employed. Critical regularization parameters were tuned, including `max_depth`, `learning_rate`, and `min_child_weight`—the latter being particularly essential for capturing sparse anomaly patterns.
+* **Zero-Day Evaluation Regimen:** The model was explicitly trained only on "known" attack patterns by masking out novel attacks from the training set. To rigorously test its out-of-distribution resilience, it was subsequently evaluated on a test set that *included* these novel attacks. This specific training-testing split aligns directly with the Model Performance report, explaining why XGBoost achieved near-perfect scores on known data but experienced a drop in F1-score when forced to classify zero-day threats.
+
 # Model Performance
 
 The evaluation compared three model architectures—**Isolation Forest (IF)**, **Autoencoder (AE)**, and **XGBoost (XGB)**—across holistic testing and novel (zero-day) attack scenarios.
