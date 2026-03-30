@@ -4,11 +4,15 @@
 
 The dataset represents captured network traffic (pcap files) processed into CSV format using CICFlowMeter. It contains bidirectional network flows with various statistical features.
 
-
 - Data collection spans 5 days
 - Total Features: 78 independent variables + 1 target variable (Label)
 - Feature Types: * Numeric (78): 54 int64 (counts, durations, ports) and 24 float64 (means, standard deviations, rates).
 - Categorical (1): Label (The attack classification).
+
+Original dataset were downloaded from [Kaggle's Network Intrusion Dataset(CIC-IDS-217)](https://www.kaggle.com/datasets/chethuhn/network-intrusion-dataset)
+
+During EDA and Feature Engineering, data preprocessing were applied to our original dataset. File sizes were large an cannot be uploaded on github via git, so I uploaded it on [kaggle](https://www.kaggle.com/datasets/chethuhn/network-intrusion-dataset) instead. Before reproducing the code, download all files and place them here at .\dataset
+
 
 ## 2. Feature Definitions
 
