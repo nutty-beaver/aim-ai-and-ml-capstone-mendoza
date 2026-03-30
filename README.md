@@ -177,3 +177,6 @@ While traditional machine learning fairness focuses on sensitive human demograph
     * Measure and track group-level evaluation metrics.
     * Apply fairness metric analogs to ensure an equal detection rate across all network groups.
     * Mitigate detected biases by oversampling or simulating rare/novel attacks in underrepresented groups, or by adjusting classification thresholds on a per-group basis.
+
+# Github Link
+[aim-ai-and-ml-capstone-mendoza](https://github.com/nutty-beaver/aim-ai-and-ml-capstone-mendoza.git)
